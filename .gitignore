@@ -1,0 +1,7 @@
+__pycache__
+.vscode
+
+ckpt/*
+logs/*
+
+training_data/*
