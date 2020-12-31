@@ -1,2 +1,98 @@
-<h1>Hello!</h1>
-<audio ref='themeSong' src="Inheritance_Etudes/Etude_1_from_Senar.wav" autoPlay loop></audio>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Stevie J. Sutanto">
+    <title>Inheritance</title>
+</head>
+<body>
+    <h1>
+        Inheritance Model
+    </h1>
+
+    <p>
+        <h3>A generative model for raw audio with decaying memory as dynamic context representation.</h3>
+        This project is a part of my Master Thesis: "Compositional Approach to Machine Learning for Generating Electroacoustic Music."<br>
+        <br>
+        The goal is for the model to learn the timbre / instrumentation of the training data (microstructure) and be able to infer a different compositional structure (macrostructure) — here, the sound quality is secondary.
+    </p>
+    
+    <p>
+        <h3>The Model Architecture</h3>
+
+        <p>
+            The design of the model is inspired by the human auditory system. It consists of two main layers: <i>memory layer</i> and <i>motoric layer</i>. Despite the names, they are not programmed to mimic exactly how human's memory and motoric system work. <br> 
+        </p>
+
+        <p>
+            In the memory layer, information about all previous timesteps is processed using GRU. <br> 
+            <br>
+            <i>memory layer:</i><br><br>
+            <img src="picture/memory_layer.png" width="150" height="240"></img>
+            <br><br>
+            The input to this layer is, unfortunately, not the full resolution of all previous timesteps — if so, the later the input, the longer the input sequence is, consuming too much computer memory. Instead, the input is compressed into a fixed n-sample long memory buffer with decaying resolution from the most recent samples to the earliest samples. For instance, if we have a sequence of 20 samples containing the values {0, 1, 2, …, 18, 19}, and the length of the buffer is 10 samples, then the memory buffer will contain the values {0, 5, 9, 12, 14, 15, 16, 17, 18, 19}. This behavior is taken away from one of Schacter’s <i>The Seven Sins of Memory</i>, transience. It is one of the memory retrieval failures that happen due to the passage of time — the memory was encoded correctly at first but fades over time. <br><br>
+            <img src="picture/decaying_alg.png"></img>
+        </p>
+        <p>
+            The motoric layer is where the encoding of the memory is processed to condition the next sample prediction. This layer runs at a different rate from the memory layer — for every n-sample memory, the motoric layer runs m times. This means all steps from the current step until the next m steps of the motoric layer are conditioned with the same vector from the memory layer.  The rate of the motoric layer corresponds to the chunk size mentioned in the previous section. Two GRUs are stacked in this layer, and the output is the sum of both cells, representing the probability distribution of the output. <br> <br>
+            <i>motoric layer:</i><br><br>
+            <img src="picture/motoric_layer.png" width="228" height="406"></img>
+            <br><br>
+        </p>
+    </p>
+
+    <p>
+        <h3>Training Data</h3>
+        <p>
+            The training data is preprocessed to 8 bit (mu-law) and 16kHz due to limited computation power. <br> <br>
+            The following are the <b>excerpts</b> to the training data:<br>
+            <br>
+            <i>Senar</i>  
+            <br>
+            <audio controls src="trainingdata_excerpts/mfh.mp3">
+                Your browser does not support the audio element.
+            </audio><br>
+            <br>
+            <i>Music, Female, Hipster</i> <br> 
+            <audio controls src="trainingdata_excerpts/senar.mp3">
+            Your browser does not support the audio element.
+            </audio><br><br>
+            <i>Note that each audio track lasts for 10 minutes and is used to trained one example model to produce one example output.</i> 
+            <br><br>
+        </p>
+    </p>
+
+    <p>
+        <h3>
+            Output
+        </h3>
+        The models are each set to output 4-minute audio samples. The results are then have to be cut to find the right moment of beginning and ending. Selected output samples from the model trained on:<br>
+        <br>
+        <i>Senar</i>  
+        <br>
+        <audio controls src="output/Etude_1_from_Senar.wav">
+        Your browser does not support the audio element.</audio><br>
+        <br>
+        <i>Music, Female, Hipster</i> <br> 
+        <audio controls src="output/Etude_2_from_Music,_Female,_Hipster.wav">
+        Your browser does not support the audio element.</audio><br>
+        <br> 
+        <i>The results are lightly post-processed with a bit of reverb and equalization.</i>
+        <br><br>
+    </p>
+
+    <p>
+        <h3>Evaluation of the Outcome</h3>
+        <p>Overall, the system still has a lot of limitations due to computational resources. </p>
+
+        <p>The system did not learn how to end a composition. That’s why I had to find the right offset to cut the generated sample.</p>
+
+        <p>When using the system, the compositional process does not feel like how composing music used to feel like. It lacks immediate auditory feedback while developing the system.</p>
+
+        <p>However, the musical outcome sounds promising. Compositionally, it produces intelligible microstructure and provides a sense of temporal development. Musically, it resembles a nostalgic event. </p>
+    </p>
+
+
+</body>
+</html>
