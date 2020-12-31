@@ -3,5 +3,5 @@ A generative model for raw audio with decaying memory as dynamic context represe
 
 Code accompaniment for my project "Inheritance", included in my Master Thesis: "Compositional Approach to Machine Learning for Generating Electroacoustic Music"
 
-
-*Details and output samples coming soon..*
+Details and audio samples:
+https://steviejsutanto.github.io/Inheritance/
